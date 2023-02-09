@@ -259,8 +259,19 @@ footer{
     text-align: center;
   }
 
+  #correctAnswer{
+    color: white;
+    font-size: 30px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-style: italic;
+    text-align: center;
+
+    animation: fadeInDown 3s;
+  }
+
   #gameOverText{
-    margin-top: 180px;
+    margin-top: 100px;
   }
 
   #playAgainButton{

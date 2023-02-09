@@ -23,6 +23,7 @@ let $correctSound = document.getElementById("correctSound"); // Retrieve the aud
 let $startSound = document.getElementById("gameStart"); // Retrieve the audio element from HTML that is holding the correct ding music path
 let $retroClick = document.getElementById("retroClick"); // Retrieve the audio element from HTML that is holding the correct ding music path
 
+let rightAnswerText = "";
 
 // Create an audio Icon that the player can click to start the Theme Music
 let $audioOnIcon = $("<img></img>").attr("id", "audioOn").attr("onclick", "playMusic(this)").attr("width", "70");
@@ -156,6 +157,8 @@ function getQuestion(){
         console.log(question[0].correctAnswer);
         $answersContainer.append($rightAnswer); // Append to Answer Container
 
+        rightAnswerText = $("#rightAnswer").text();
+
         for (var i = 0; i < question[0].incorrectAnswers.length; i++){
             let $notrightAnswer = $("<button></button>").attr("id", "notrightAnswer"); // Create an incorrect answer button and set id
             $notrightAnswer.attr("onclick", "checkAnswer(this)"); // Create an onclick attribute that will execute checkAnswer function
@@ -190,7 +193,7 @@ function lifeLineClicked(){
 // Start the countdown Timer Bar on each question
 function startCountdown(){
     var reverse_counter = 0; // Set counter to 0
-    let maxTime = 1000; // Set max Time for each countdown (in seconds*10)
+    let maxTime = 1000; // Set max Time for each countdown (in seconds/100)
 
     let $progressBar = $("<progress></progress>").attr("id", "pbar"); // Create a progress bar icon for HTML
     $progressBar.attr("value", maxTime).attr("max", maxTime); // Set value and max equal to maxTime for bar
@@ -232,7 +235,7 @@ function difficultyDropDownStore(selection) {
     $retroClick.currentTime = .1; // Play Retro Sound Effect but skip the small gap of silence in mp3
     $retroClick.play();
 
-    if (document.getElementById("categoryDropDown".innerHTML !== ""))    {
+    if (document.getElementById("categoryDropDown").innerHTML !== "")    {
         document.getElementById("categoryDropDown").classList.toggle("show"); // Toggle the Drop Down list on and off every time you click it      
         return;
     }
@@ -301,10 +304,13 @@ function endScreen()
     $(".answersContainer").empty(); // Remove answers from screen
     $(".score").empty(); // Remove answers from screen
 
-    
     let $gameOver = $("<h2></h2>").text("Game Over"); // Create a header that will say "Game Over" for HTML
     $gameOver.attr("id", "gameOverText");
     $(".gameOverScreen").append($gameOver);
+
+    let $correctAnswer  = $("<h3></h3>"); // Show the correct answer for HTML
+    $correctAnswer.text(`You Suck! The Correct Answer was ..... ${rightAnswerText}`).attr("id", "correctAnswer"); // Set value of label to current value of score variable
+    $(".gameOverScreen").append($correctAnswer);
 
     let $score  = $("<h3></h3>"); // Create a score label for HTML
     $score.text(`Score: ${score}`).attr("id", "score"); // Set value of label to current value of score variable
