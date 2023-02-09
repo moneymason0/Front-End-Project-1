@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script defer src="jquery.js"></script>
     <script defer src="app.js"></script>
     <title> Trivia App </title>
@@ -13,23 +14,37 @@
     <audio id="themeAudio" src="C:\Users\Tony Stark\Desktop\Microsoft VS Code\coding-practice\Front-End-Project-1\come-on-boy-8018.mp3"></audio>
     <audio id="thinkingAudio" src="03 Jeopardy Think Music.mp3"></audio>
     <audio id="gameOverAudio" src="C:\Users\Tony Stark\Desktop\Microsoft VS Code\coding-practice\Front-End-Project-1\wrong answer.mp3"></audio>
-    <h1> ARE YOU READY FOR SOME TRIVIA!!!</h1>
+    <div class="titleContainer">
+        <h1> TRIVIA GAME!!!</h1>
+        <button onclick="showInput()" class="dropbtn" id="Start"> Click to Play </button>
+    </div>
     <div class="input">
-        <button onclick="difficultyDropDownShow()" class="dropbtn" id="difficulty"> Difficulty </button>
-        <div id="difficultyDropDown" class="dropdown-content">
-            <a id="easy" onclick="difficultyDropDownStore(this)"> Easy </a>
-            <a id="medium" onclick="difficultyDropDownStore(this)"> Medium </a>
-            <a id="hard" onclick="difficultyDropDownStore(this)"> Hard </a>
+        <div class="dropDownContainer">
+            <div class="difficultyContainer">
+                <button onclick="difficultyDropDownShow()" class="dropbtn" id="difficulty"> Difficulty </button>
+                <div id="difficultyDropDown" class="dropdown-content">
+                    <a id="easy" onclick="difficultyDropDownStore(this)"> Easy </a>
+                    <a id="medium" onclick="difficultyDropDownStore(this)"> Medium </a>
+                    <a id="hard" onclick="difficultyDropDownStore(this)"> Hard </a>
+                </div>
+            </div>
+            <div class="categoryContainer">
+                <button onclick="categoryDropDownShow()" class="dropbtn" id="category"> Category </button>
+                <div id="categoryDropDown" class="dropdown-content"></div>
+            </div>
         </div>
-
-        <button onclick="categoryDropDownShow()" class="dropbtn" id="category"> Category </button>
-        <div id="categoryDropDown" class="dropdown-content"></div>
-        <button id="ready"> Ready to Play! </button>
+        <div class="readyButtonContainer">
+            <button id="ready"> Ready to Play! </button>
+        </div>
+    </div>
+    <div class="contentContainer">
+        <div class="timerContainer"></div>
+        <div class="lifeLineContainer"></div>
+        <div class="questionContainer"></div>
+        <div class="answersContainer"></div>
+        <div class="score"></div>
     </div>
     <div class="gameOverScreen"></div>
-    <div class="questionContainer"></div>
-    <div class="answersContainer"></div>
-    <div class="score"></div>
 </body>
 <footer>
     <h3>All credit goes to the Trivia API: https://the-trivia-api.com/docs/ </h3>

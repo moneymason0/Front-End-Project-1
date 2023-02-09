@@ -22,18 +22,28 @@ let $gameOverMusic = document.getElementById("gameOverAudio"); // Retrieve the a
 
 // Create an audio Icon that the player can click to start the Theme Music
 let $audioOnIcon = $("<img></img>").attr("id", "audioOn").attr("onclick", "playMusic(this)").attr("width", "100");
-$audioOnIcon.attr("src", "https://www.pngimages.pics/images/quotes/english/general/transparent-speaker-silhouette-clip-art-52650-275858.png");
+$audioOnIcon.attr("src", "C:\Users\Tony Stark\Desktop\Microsoft VS Code\coding-practice\Front-End-Project-1\Un_muted_Audio_Icon.png");
 $body.prepend($audioOnIcon);
 
 // Create an audio Icon that the player can click to pause the Theme Music
 let $audioOffIcon = $("<img></img>").attr("id", "audioOff").attr("onclick", "playMusic(this)").attr("width", "50");
-$audioOffIcon.attr("src", "https://www.pngall.com/wp-content/uploads/8/Mute-Audio-PNG-Pic.png");
+$audioOffIcon.attr("src", "C:\Users\Tony Stark\Desktop\Microsoft VS Code\coding-practice\Front-End-Project-1\Muted_Audio_Icon.png");
 $audioOffIcon.css("margin-left", "20px");
 $body.prepend($audioOffIcon);
 $audioOffIcon.hide(); // this will effectively hide the image (just like CSS, display: "none")
 
 let $readyButton = $("#ready"); // Grab the Ready Button from the HTML 
 $readyButton.click(getQuestion); // Add a click event listener to the button 
+
+$(".contentContainer").hide(); // Hide Content Container until game is started
+$(".gameOverScreen").hide();
+$(".input").hide();
+$("titleContainer").show();
+
+function showInput(){
+ $("titleContainer").hide();
+ $(".input").show();
+}
 
 // Once either audio icon is clicked play/pause the music depending on which one was choosen
 function playMusic(icon){
@@ -53,6 +63,17 @@ function playMusic(icon){
 
 // Retrieve a question from the API and display the possible answer choices
 function getQuestion(){
+        category = categoryArray.toString(); // Get all elements from Category Array and turn it into a String for API query
+        // If category or difficulty have not been selected prompt user and return out of function
+        if (difficulty === "" || category === ""){
+            alert("Please choose a cateogry and difficulty");
+            return;
+        }
+
+        $(".input").hide();   // Hide Input Container From Screen
+        $(".gameOverScreen").hide(); // Hide Game Over Screen
+        $(".contentContainer").show(); // Show Content Container
+
         $readyButton.hide(); // Hide the ready Button, Dont need it once first game is started since there is a "Play Again" Button
 
         $themeMusic.pause();    // Pause Theme Music   
@@ -66,18 +87,19 @@ function getQuestion(){
 
         $thinkingMusic.play(); // Play Thinking Music
 
-        category = categoryArray.toString(); // Get all elements from Category Array and turn it into a String for API query
-     // If category or difficulty have not been selected prompt user and return out of function
-        if (difficulty === "" || category === ""){
-            alert("Please choose a cateogry and difficulty");
-            return;
-        }
-
     // Clear questionnaire to ensure nothing from previous questions bleeds over
     clearInterval(questionTimer);
+    $(".lifeLineContainer").empty();
     $(".questionContainer").empty();
     $(".answersContainer").empty();
+    $(".timerContainer").empty();
     $(".score").empty();
+    $(".gameOverScreen").empty();
+    $("#playAgainButton").empty();
+    
+    let $score  = $("<h2></h2>"); // Create a score label for HTML
+    $score.text(`Score: ${score}`); // Set value of label to current value of score variable
+    $(".score").append($score);
 
     let $questionContainer = $(".questionContainer"); // Retrieve question container from HTML
 
@@ -86,17 +108,17 @@ function getQuestion(){
         let $lifeLineButton = $("<button></button>").attr("id", "lifeLineButton");
         $lifeLineButton.text(`${3-lifeLineCounter} Life-Lines left`).attr("title", "This Life-Line will eliminate to wrong answers.");
         $lifeLineButton.click(lifeLineClicked);
-        $questionContainer.prepend($lifeLineButton);
+        $(".lifeLineContainer").prepend($lifeLineButton);
     }
     else // Player has used up all Life-Lines available for that game, get rid of Life-Line button
     {
         let $outOfLifeLine = $("<h3></h3>");
         $outOfLifeLine.text("Out of Life-Lines");
-        $questionContainer.prepend($outOfLifeLine);
+        $l(".lifeLineContainer").prepend($outOfLifeLine);
     }
 
     // Retrieve question from API using difficulty selected by the user and the categories of questions
-    let xhr = $.get(`https://the-trivia-api.com/api/questions?categories=${category}&limit=1&region=US&difficulty=${difficulty}`, (question) => {
+    $.get(`https://the-trivia-api.com/api/questions?categories=${category}&limit=1&region=US&difficulty=${difficulty}`, (question) => {
         
         // Check to make sure that the question is not a duplicate
         if (questionArray.indexOf(question[0].id) !== -1){
@@ -105,10 +127,6 @@ function getQuestion(){
         }
 
         questionArray.push(question[0].id); // Push the new question id to the question array to compare with future questions
-
-        let $score  = $("<h2></h2>"); // Create a score label for HTML
-        $score.text(`Score: ${score}`); // Set value of label to current value of score variable
-        $(".score").append($score);
 
         let $questionHeading = $("<h2></h2>"); // Create a question heading for HTML
         $questionHeading.text(question[0].question); // Retrieve question text from API
@@ -131,6 +149,7 @@ function getQuestion(){
             let random = Math.floor(Math.random() * 100); // Random number between 0 and 99
             random % 2 === 0 ? $answersContainer.append($notrightAnswer) : $answersContainer.prepend($notrightAnswer);
         }
+
         startCountdown(); // Initiate countdown timer
     });
 }
@@ -157,12 +176,11 @@ function lifeLineClicked(){
 function startCountdown(){
     var reverse_counter = 0; // Set counter to 0
     let maxTime = 1000; // Set max Time for each countdown (in seconds*10)
-    let $questionContainer = $(".questionContainer"); 
 
     let $progressBar = $("<progress></progress>").attr("id", "pbar"); // Create a progress bar icon for HTML
     $progressBar.attr("value", maxTime).attr("max", maxTime); // Set value and max equal to maxTime for bar
     $progressBar.css("width", "70%");
-    $questionContainer.prepend($progressBar); 
+    $(".timerContainer").prepend($progressBar); 
 
     questionTimer = setInterval(function(){ // Set Interval function which will slowly decrease the value of the progress bar
          $("#pbar").val(maxTime - reverse_counter);
@@ -189,6 +207,10 @@ function difficultyDropDownStore(selection) {
   }
 // Show the category drop down menu for player to select a category
   function categoryDropDownShow() {
+    if (document.getElementById("categoryDropDown".innerHTML !== ""))    {
+        document.getElementById("categoryDropDown").classList.toggle("show"); // Toggle the Drop Down list on and off every time you click it
+        return;
+    }
     // Get possible categories from Trivia API
     $.get(`https://the-trivia-api.com/api/categories`, (categories) => {
     // This will result in a JSON that every category stored in its keys, each key is an array that has every possible acceptable string input for that category
@@ -213,8 +235,7 @@ function difficultyDropDownStore(selection) {
         let index = categoryArray.indexOf(selection.id);
         categoryArray.splice(index, 1);
     }
-
-    document.getElementById("category").innerText = `${categoryArray.toString(",").toUpperCase()}`; // Change text in Drop Down to reflect players Choice
+    document.getElementById(selection.id).classList.toggle("selected");
 }
 
 // Answer submitted from player, check if it is right or wrong
@@ -229,6 +250,10 @@ function checkAnswer(selectedAnswer){
 
 function endScreen()
 {
+    $(".input").hide(); // Hide Input Screen Container
+    $(".contentContainer").hide(); // Hide Content Container (container for the question and answers)
+    $(".gameOverScreen").show (); // Show Game Over Screen Container
+
     // If the player answers a question wrong the timer will still be counting
     clearInterval(questionTimer); // Clear timer so that it doesnt enter endScreen() twice
 
@@ -240,11 +265,19 @@ function endScreen()
 
     $gameOverMusic.play();
 
-    $(".questionContainer").empty(); // Remove Question from screen
-    $(".answersContainer").empty(); // Remore answers from screen
+    $(".timerContainer").empty();
+    $(".lifeLineContainer").empty(); // Remove Question from screen
+    $(".questionContainer").empty(); // Remove Life-Container from screen
+    $(".answersContainer").empty(); // Remove answers from screen
+    $(".score").empty(); // Remove answers from screen
+
     
     let $gameOver = $("<h2></h2>").text("Game Over"); // Create a header that will say "Game Over" for HTML
     $(".gameOverScreen").append($gameOver);
+
+    let $score  = $("<h2></h2>"); // Create a score label for HTML
+    $score.text(`Score: ${score}`); // Set value of label to current value of score variable
+    $(".gameOverScreen").append($score);
 
     let $playAgainButton = $("<button></button>").attr("id", "playAgainButton"); // Create a playAgain Button to start another round
     $playAgainButton.attr("onclick", "reset()").text("Play Again?"); // Play Again Button will initiate reset once clicked
@@ -258,8 +291,10 @@ function reset()
     lifeLineCounter = 0;
     questionArray = [];
     
+    $(".lifeLineContainer").empty();
     $(".questionContainer").empty();
     $(".answersContainer").empty();
+    $(".timerContainer").empty();
     $(".score").empty();
     $(".gameOverScreen").empty();
     $("#playAgainButton").empty();
