@@ -1,19 +1,23 @@
 // -------------------------------------------------------------------------------
-// POOR MAN'S TRIVIA
+// POOR MAN'S TRIVIA (API: https://the-trivia-api.com/docs/)
 // -------------------------------------------------------------------------------
 
 let $body = $("body"); // Retrieve the body element from HTML
 
 let difficulty = ""; // Declare a difficulty variable which will hold the difficulty choosen by the player
-let category = ""; // Declare a category variable which will hold all the categories choosen by the player
+let categoryArray = []; // Declare a category array which will hold all the categories choosen by the player
+let category = ""; // Declare a category string which will be used to hold the element from the Category Array in a single string for the API query
  
-var questionTimer; // Will be the timer for each question (using setInterval method)
+let questionTimer; // Will be the timer for each question (using setInterval method)
+let questionArray = []; // Store the question IDs for all retrieved questions to ensure no duplicate questions in the same game
 
 let score = 0;  // Keep track of the player's score, +1 for every question that is right
 let lifeLineCounter = 0; // Keep track of the number of Life-Lines that has been used thus far
 
 let $themeMusic = document.getElementById("themeAudio"); // Retrieve the audio element from HTML that is holding the theme music path
+$themeMusic.loop = true; // Makes sure the music loops when done
 let $thinkingMusic = document.getElementById("thinkingAudio"); // Retrieve the audio element from HTML that is holding the thiking music path
+$thinkingMusic.loop = true; // Makes sure the music loops when done
 let $gameOverMusic = document.getElementById("gameOverAudio"); // Retrieve the audio element from HTML that is holding the game over music path
 
 // Create an audio Icon that the player can click to start the Theme Music
@@ -49,7 +53,7 @@ function playMusic(icon){
 
 // Retrieve a question from the API and display the possible answer choices
 function getQuestion(){
-        $readyButton.hide();
+        $readyButton.hide(); // Hide the ready Button, Dont need it once first game is started since there is a "Play Again" Button
 
         $themeMusic.pause();    // Pause Theme Music   
         $themeMusic.currentTime = 0; // Set time to 0 allows the next time the Theme Music plays it will be at the begin
@@ -62,6 +66,7 @@ function getQuestion(){
 
         $thinkingMusic.play(); // Play Thinking Music
 
+        category = categoryArray.toString(); // Get all elements from Category Array and turn it into a String for API query
      // If category or difficulty have not been selected prompt user and return out of function
         if (difficulty === "" || category === ""){
             alert("Please choose a cateogry and difficulty");
@@ -79,7 +84,7 @@ function getQuestion(){
     // If the player has Life-Lines left, then recreate the button for this question
     if (lifeLineCounter !== 3) {
         let $lifeLineButton = $("<button></button>").attr("id", "lifeLineButton");
-        $lifeLineButton.text("Life-Line").attr("title", "This Life-Line will eliminate to wrong answers.");
+        $lifeLineButton.text(`${3-lifeLineCounter} Life-Lines left`).attr("title", "This Life-Line will eliminate to wrong answers.");
         $lifeLineButton.click(lifeLineClicked);
         $questionContainer.prepend($lifeLineButton);
     }
@@ -91,8 +96,16 @@ function getQuestion(){
     }
 
     // Retrieve question from API using difficulty selected by the user and the categories of questions
-    $.get(`https://the-trivia-api.com/api/questions?categories=${category}&limit=1&region=US&difficulty=${difficulty}`, (question) => {
+    let xhr = $.get(`https://the-trivia-api.com/api/questions?categories=${category}&limit=1&region=US&difficulty=${difficulty}`, (question) => {
         
+        // Check to make sure that the question is not a duplicate
+        if (questionArray.indexOf(question[0].id) !== -1){
+            getQuestion(); // Get a new question
+            return;  // Execute out of current cycle to avoid continuing with the duplicate question
+        }
+
+        questionArray.push(question[0].id); // Push the new question id to the question array to compare with future questions
+
         let $score  = $("<h2></h2>"); // Create a score label for HTML
         $score.text(`Score: ${score}`); // Set value of label to current value of score variable
         $(".score").append($score);
@@ -122,6 +135,7 @@ function getQuestion(){
     });
 }
 
+
 // Execute Life-Line function by removing two wrong answer choices
 function lifeLineClicked(){
     lifeLineCounter++; // Keep track of how many Life-Lines have been used
@@ -142,11 +156,12 @@ function lifeLineClicked(){
 // Start the countdown Timer Bar on each question
 function startCountdown(){
     var reverse_counter = 0; // Set counter to 0
-    let maxTime = 10; // Set max Time for each countdown (in seconds)
+    let maxTime = 1000; // Set max Time for each countdown (in seconds*10)
     let $questionContainer = $(".questionContainer"); 
 
     let $progressBar = $("<progress></progress>").attr("id", "pbar"); // Create a progress bar icon for HTML
     $progressBar.attr("value", maxTime).attr("max", maxTime); // Set value and max equal to maxTime for bar
+    $progressBar.css("width", "70%");
     $questionContainer.prepend($progressBar); 
 
     questionTimer = setInterval(function(){ // Set Interval function which will slowly decrease the value of the progress bar
@@ -157,7 +172,7 @@ function startCountdown(){
                 endScreen();  // Player loses, go to end screen
             }
         reverse_counter++; // Increase counter to take away 1 more second from timer
-    },1000);
+    }, 10);
 }
 
 // Show the Drop Down Menu for Difficulty
@@ -168,6 +183,7 @@ function difficultyDropDownShow() {
 // Store the players selection of difficulty
 function difficultyDropDownStore(selection) {
     $("#difficulty").text(selection.id.toUpperCase()); // Change text in Drop Down to reflect players Choice
+    document.getElementById("difficultyDropDown").classList.toggle("show");  
 
     difficulty = selection.id; // Store in variable to use in API retrieval later
   }
@@ -185,17 +201,20 @@ function difficultyDropDownStore(selection) {
         $("#categoryDropDown").append($a); // Append anchor to Category Drop Down List
     }
     });
+
     document.getElementById("categoryDropDown").classList.toggle("show"); // Toggle the Drop Down list on and off every time you click it
   }
 
   // Store player selection for categories
   function categoryDropDownStore(selection){
-    if (document.getElementById("category").innerText.toUpperCase() == "CATEGORY")
-            document.getElementById("category").innerText = `${selection.id.toUpperCase()}`; // Change text in Drop Down to reflect players Choice
-    else
-        document.getElementById("category").innerText += `, ${selection.id.toUpperCase()}`; // Change text in Drop Down to reflect players Choice
+    if (categoryArray.indexOf(selection.id) === -1) // If category not currently in Array
+            categoryArray.push(selection.id); // Append category array with the latest category that was clicked
+    else {
+        let index = categoryArray.indexOf(selection.id);
+        categoryArray.splice(index, 1);
+    }
 
-    category += ", " + selection.id; // Append category variable with the latest category that was clicked
+    document.getElementById("category").innerText = `${categoryArray.toString(",").toUpperCase()}`; // Change text in Drop Down to reflect players Choice
 }
 
 // Answer submitted from player, check if it is right or wrong
@@ -237,6 +256,7 @@ function reset()
 {
     score = 0;
     lifeLineCounter = 0;
+    questionArray = [];
     
     $(".questionContainer").empty();
     $(".answersContainer").empty();

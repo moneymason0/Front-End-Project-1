@@ -6,6 +6,18 @@ h2{
     text-align: center;
 }
 
+footer{
+  color: white;
+  background-color: black;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-style: italic;
+  font-weight: bold;
+
+  width: 100%;
+  text-align: center;
+}
+
 .answerContainer{
     margin: auto;
     width: fit-content;
