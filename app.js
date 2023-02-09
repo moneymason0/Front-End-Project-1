@@ -19,16 +19,19 @@ $themeMusic.loop = true; // Makes sure the music loops when done
 let $thinkingMusic = document.getElementById("thinkingAudio"); // Retrieve the audio element from HTML that is holding the thiking music path
 $thinkingMusic.loop = true; // Makes sure the music loops when done
 let $gameOverMusic = document.getElementById("gameOverAudio"); // Retrieve the audio element from HTML that is holding the game over music path
+let $correctSound = document.getElementById("correctSound"); // Retrieve the audio element from HTML that is holding the correct ding music path
+let $startSound = document.getElementById("gameStart"); // Retrieve the audio element from HTML that is holding the correct ding music path
+let $retroClick = document.getElementById("retroClick"); // Retrieve the audio element from HTML that is holding the correct ding music path
+
 
 // Create an audio Icon that the player can click to start the Theme Music
-let $audioOnIcon = $("<img></img>").attr("id", "audioOn").attr("onclick", "playMusic(this)").attr("width", "100");
-$audioOnIcon.attr("src", "C:\Users\Tony Stark\Desktop\Microsoft VS Code\coding-practice\Front-End-Project-1\Un_muted_Audio_Icon.png");
+let $audioOnIcon = $("<img></img>").attr("id", "audioOn").attr("onclick", "playMusic(this)").attr("width", "70");
+$audioOnIcon.attr("src", "C:/Users/Tony Stark/Desktop/Microsoft VS Code/coding-practice/Front-End-Project-1/Un_muted_Audio_Icon.png");
 $body.prepend($audioOnIcon);
 
 // Create an audio Icon that the player can click to pause the Theme Music
-let $audioOffIcon = $("<img></img>").attr("id", "audioOff").attr("onclick", "playMusic(this)").attr("width", "50");
-$audioOffIcon.attr("src", "C:\Users\Tony Stark\Desktop\Microsoft VS Code\coding-practice\Front-End-Project-1\Muted_Audio_Icon.png");
-$audioOffIcon.css("margin-left", "20px");
+let $audioOffIcon = $("<img></img>").attr("id", "audioOff").attr("onclick", "playMusic(this)").attr("width", "70");
+$audioOffIcon.attr("src", "C:/Users/Tony Stark/Desktop/Microsoft VS Code/coding-practice/Front-End-Project-1/Muted_Audio_Icon.png");
 $body.prepend($audioOffIcon);
 $audioOffIcon.hide(); // this will effectively hide the image (just like CSS, display: "none")
 
@@ -41,20 +44,32 @@ $(".input").hide();
 $("titleContainer").show();
 
 function showInput(){
- $("titleContainer").hide();
- $(".input").show();
+    $startSound.currentTime = .2;
+    $startSound.play();
+
+    score = 0;  // Reset Score for Next Game
+    lifeLineCounter = 0; //Reset Life Line Counter for Next Game
+    questionArray = []; // Reset the question Array for Next Game
+
+    $(".titleContainer").hide();
+    $("footer").hide();
+    $(".gameOverScreen").hide();
+
+    $(".input").show();
+    $readyButton.show();
 }
 
 // Once either audio icon is clicked play/pause the music depending on which one was choosen
 function playMusic(icon){
     if (icon.id === "audioOn"){
+        $themeMusic.currentTime = .7;
         $themeMusic.play(); // Play Theme Music
         $audioOnIcon.hide(); // Now hide the 'Audio On' Icon
         $audioOffIcon.show(); // Now show the 'Audio Off' Icon
     }
     else {    
         $themeMusic.pause();
-        $themeMusic.currentTime = 0;
+        $themeMusic.currentTime = .7;
 
         $audioOffIcon.hide();
         $audioOnIcon.show();
@@ -114,7 +129,8 @@ function getQuestion(){
     {
         let $outOfLifeLine = $("<h3></h3>");
         $outOfLifeLine.text("Out of Life-Lines");
-        $l(".lifeLineContainer").prepend($outOfLifeLine);
+        $outOfLifeLine.attr("id", "outOfLifeLineText");
+        $(".lifeLineContainer").prepend($outOfLifeLine);
     }
 
     // Retrieve question from API using difficulty selected by the user and the categories of questions
@@ -153,7 +169,6 @@ function getQuestion(){
         startCountdown(); // Initiate countdown timer
     });
 }
-
 
 // Execute Life-Line function by removing two wrong answer choices
 function lifeLineClicked(){
@@ -196,10 +211,17 @@ function startCountdown(){
 // Show the Drop Down Menu for Difficulty
 function difficultyDropDownShow() {
   document.getElementById("difficultyDropDown").classList.toggle("show");  
+
+  $retroClick.currentTime = .1; // Play Retro Sound Effect but skip the small gap of silence in mp3
+  $retroClick.play();
 }
 
 // Store the players selection of difficulty
 function difficultyDropDownStore(selection) {
+
+    $retroClick.currentTime = .1; // Play Retro Sound Effect but skip the small gap of silence in mp3
+    $retroClick.play();
+
     $("#difficulty").text(selection.id.toUpperCase()); // Change text in Drop Down to reflect players Choice
     document.getElementById("difficultyDropDown").classList.toggle("show");  
 
@@ -207,8 +229,11 @@ function difficultyDropDownStore(selection) {
   }
 // Show the category drop down menu for player to select a category
   function categoryDropDownShow() {
+    $retroClick.currentTime = .1; // Play Retro Sound Effect but skip the small gap of silence in mp3
+    $retroClick.play();
+
     if (document.getElementById("categoryDropDown".innerHTML !== ""))    {
-        document.getElementById("categoryDropDown").classList.toggle("show"); // Toggle the Drop Down list on and off every time you click it
+        document.getElementById("categoryDropDown").classList.toggle("show"); // Toggle the Drop Down list on and off every time you click it      
         return;
     }
     // Get possible categories from Trivia API
@@ -229,6 +254,9 @@ function difficultyDropDownStore(selection) {
 
   // Store player selection for categories
   function categoryDropDownStore(selection){
+    $retroClick.currentTime = .1; // Play Retro Sound Effect but skip the small gap of silence in mp3
+    $retroClick.play();
+
     if (categoryArray.indexOf(selection.id) === -1) // If category not currently in Array
             categoryArray.push(selection.id); // Append category array with the latest category that was clicked
     else {
@@ -242,6 +270,8 @@ function difficultyDropDownStore(selection) {
 function checkAnswer(selectedAnswer){
     if(selectedAnswer.id === "rightAnswer"){ // Answer is correct
         score++; // Add +1 to score
+        $correctSound.currentTime = .7;
+        $correctSound.play(); // Play the correct sound effect ding
         getQuestion(); // Go back to retrieve another question
     }
     else     // Answer is wrong
@@ -273,24 +303,33 @@ function endScreen()
 
     
     let $gameOver = $("<h2></h2>").text("Game Over"); // Create a header that will say "Game Over" for HTML
+    $gameOver.attr("id", "gameOverText");
     $(".gameOverScreen").append($gameOver);
 
-    let $score  = $("<h2></h2>"); // Create a score label for HTML
-    $score.text(`Score: ${score}`); // Set value of label to current value of score variable
+    let $score  = $("<h3></h3>"); // Create a score label for HTML
+    $score.text(`Score: ${score}`).attr("id", "score"); // Set value of label to current value of score variable
     $(".gameOverScreen").append($score);
 
     let $playAgainButton = $("<button></button>").attr("id", "playAgainButton"); // Create a playAgain Button to start another round
     $playAgainButton.attr("onclick", "reset()").text("Play Again?"); // Play Again Button will initiate reset once clicked
     $(".gameOverScreen").append($playAgainButton);
+
+    let $changeInputs = $("<button></button>").attr("id", "changeInput"); // Create a playAgain Button to start another round
+    $changeInputs.attr("onclick", "showInput()").text("Change Difficulty/Category"); // Play Again Button will initiate reset once clicked
+    $(".gameOverScreen").append($changeInputs);
 }
 
 // Reset will reset all values/container to ensure no bleed-over from one game to another
 function reset()
-{
-    score = 0;
-    lifeLineCounter = 0;
-    questionArray = [];
+{       
+    $retroClick.currentTime = .1; // Play Retro Sound Effect but skip the small gap of silence in mp3
+    $retroClick.play();
+
+    score = 0;  // Reset Score for Next Game
+    lifeLineCounter = 0; //Reset Life Line Counter for Next Game
+    questionArray = []; // Reset the question Array for Next Game
     
+    // Empty every container with content already in it to avoid bleed over to the next game
     $(".lifeLineContainer").empty();
     $(".questionContainer").empty();
     $(".answersContainer").empty();

@@ -10,19 +10,14 @@ h1{
     font-size: 50px;
     color:white;
 
-    margin-top: 150px;
+    margin-top: 250px;
     padding-bottom: 10px;
 
     animation: TitleAnimation .5s infinite alternate;
 }
 
-@keyframes TitleAnimation { 
-  from { 
-    transform: scale(1.5) rotate(-20deg); 
-  } 
-}
-
-h2{
+h2 {
+    color: white;
     font-size: 30px;
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
@@ -40,6 +35,15 @@ footer{
   text-align: center;
 }
 
+#audioOff{
+  opacity:0.7;
+}
+
+#audioOn:hover, #audioOff:hover{
+  transition: all 0.3s ease-in-out;
+  transform: scale(1.2);
+}
+
 .input, .contentContainer, .gameOverScreen, .titleContainer{
   width: 70%;
   height: 500px;
@@ -48,27 +52,67 @@ footer{
   padding: 3px;
 
   color: black;
-  background: pink;
 
   justify-content: center;
 }
 
-.dropDownContainer, .questionContainer{
+.dropDownContainer{
   display: flex;
   width: 100%;
   height: 40%;
 
+  margin-top: 100px;
+
   justify-content: space-evenly;
   align-items: center;
+
+  animation: fadeInDownButton 2s;
 }
 
-.lifeLineContatiner{
+.timerContainer{
+  display: flex;
+  width: 100%;
+  height: 20%;
+
+  margin-top: 50px;
+  margin-bottom: 15px;
+
+  justify-content: space-evenly;
+  align-items: center;
+
+  animation: fadeInDownButton 2s;
+}
+
+#pbar{
+  margin:0;
+  padding:0;
+}
+
+.questionContainer{
+  justify-content: space-evenly;
+  align-items: center;
+
+  animation: fadeInDownButton 2s;
+}
+
+.lifeLineContainer{
   display: flex;
   width: 100%;
   height: 5%;
 
+  padding-bottom: 10px;
+
   justify-content: center;
-  align-items: center;
+
+  animation: fadeInDownButton 2s;
+
+}
+
+#outOfLifeLineText{
+  color: white;
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
 }
 
 .readyButtonContainer{
@@ -80,18 +124,48 @@ footer{
   align-items: center;
 }
 
-#ready, #difficulty, #category, #playAgainButton, #Start{
+#ready, #difficulty, #category, #changeInput, #playAgainButton, #Start{
   transition: all 0.3s ease-in-out;
+  height: fit-content;
+  max-width: 300px;
 
   color: white;
   background-color: black;
 
-  border-color: solid white;
+  border-color: white;
+  border-style: solid;
   border-width: 4px;
   border-radius: 10px;
 
   font-size: 30px;
   font-weight: bold;
+  
+  animation: fadeInDownButton 2s;
+}
+
+#lifeLineButton{
+  transition: all 0.3s ease-in-out;
+  height: fit-content;
+
+  color: white;
+  background-color: black;
+
+  border-color: white;
+  border-style: solid;
+  border-width: 4px;
+  border-radius: 10px;
+
+  font-size: 30px;
+  font-weight: bold;
+}
+
+#ready:hover, #difficulty:hover, #category:hover, #rightAnswer:hover, #notrightAnswer:hover, #changeInput:hover, #playAgainButton:hover, #Start:hover, #lifeLineButton:hover{
+  color: black;
+  background-color: white;
+
+  border-color: black;
+
+  transform: scale(1.2);
 }
 
 #Start{
@@ -107,33 +181,24 @@ footer{
   align-items: center;
 }
 
-.score{
-  background-color: white;
-}
-
 #rightAnswer, #notrightAnswer{
   transition: all 0.3s ease-in-out;
 
   color: white;
   background-color: black;
 
-  border-color: solid white;
+  border-color: white;
+  border-style: solid;
   border-width: 4px;
   border-radius: 10px;
 
   font-size: 25px;
   font-weight: bold;
+
+  margin: 5px;
+
+  animation: fadeInDownButton 2s;
 }
-
-#ready:hover, #difficulty:hover, #category:hover, #rightAnswer:hover, #notrightAnswer:hover, #playAgainButton:hover, #Start:hover{
-  color: black;
-  background-color: white;
-
-  border-color: solid black;
-
-  transform: scale(1.2);
-}
-
 
 .answerContainer{
     margin: auto;
@@ -178,13 +243,38 @@ footer{
     transform: scale(1.2);
   }
 
-  #audioOff{
-    opacity:0.7;
+  #gameOverText, #score{
+    font-size: 100px;
+
+    margin: 0;
+    padding: 0;
+
+    animation: fadeInDown 3s;
   }
 
-  #audioOn:hover, #audioOff:hover{
-    transition: all 0.3s ease-in-out;
-    transform: scale(1.2);
+  #score{
+    color: white;
+    font-size: 70px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+  }
+
+  #gameOverText{
+    margin-top: 180px;
+  }
+
+  #playAgainButton{
+    width: fit-content;
+
+    margin-top: 30px;
+    margin-left: 440px;
+  }
+
+  #changeInput{
+    width: fit-content;
+
+    margin-top: 30px;
+    margin-left: 380px;
   }
 
   .selected{
@@ -194,3 +284,31 @@ footer{
   .show {
     display: block;
   }
+
+@keyframes fadeInDown {
+  0% {
+     opacity: 0;
+     transform: translateY(-80px);
+  }
+  100% {
+     opacity: 1;
+     transform: translateY(0);
+  }
+} 
+  
+@keyframes fadeInDownButton {
+  0% {
+     opacity: 0;
+     transform: translateY(-40px);
+  }
+  100% {
+     opacity: 1;
+     transform: translateY(0);
+  }
+} 
+
+@keyframes TitleAnimation { 
+  from { 
+    transform: scale(1.5) rotate(-20deg); 
+  } 
+}
